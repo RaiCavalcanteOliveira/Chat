@@ -11,10 +11,21 @@ app.get('/', function(req, res) {
 
 io.on('connection', (socket) => {
   console.log('Usuário conectado');
-  socket.on('chat message', (data) => io.emit('chat message', data));
-  socket.on('disconnect', () => console.log('Usuário desconectado'));
+
+  socket.on('chat message', (data) => {
+    io.emit('chat message', data);
+  });
+
+  socket.on('send private message', function (id, msg) {
+    console.log('Sending private message to user', id, 'saying', msg);
+    io.to(id).emit('private message', socket.id, msg);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Usuário desconectado');
+  });
 });
 
 http.listen(3000, () => {
-  console.log(`Servidor rodando na porta 3000 - Link http://localhost:3000`);
+  console.log('Servidor rodando na porta 3000 - Link http://localhost:3000');
 });
